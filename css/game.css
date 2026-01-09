@@ -1,0 +1,108 @@
+/* CSS Document */
+
+html, body {
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	background-color: black;
+	background-image: url("../img/forest.png");
+	background-repeat: no-repeat;
+	background-position: center center;
+	background-attachment: fixed;
+	background-size: cover;
+	font-family:  open-sans, sans-serif;
+	font-size: 18px;
+	color: white;
+	}
+	
+h1 {color:white;
+	margin: 2px;
+    padding: 10px;
+	text-shadow: 2px 2px black, -2px -2px black, 2px 4px rgb(35, 35, 28);
+	font-size: 44px;
+    }
+	
+
+div#content {
+    width: 700px;
+    margin:0 auto;
+	 }
+	
+div#controls {
+	text-align: right; }
+	
+div#controls span {
+	font-weight: bold;
+    font-size: 18px;
+	color: yellow;
+	padding-right:20px;
+    }
+			
+div#content {
+	width: 700px;
+	margin:0 auto;
+	padding: 20px;
+		 }
+
+
+.timer {
+    font-weight: bold;
+    font-size: 18px;
+	color: yellow;
+    display:none;   
+}
+
+p {color:white;
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
+	line-height: 30px;
+}
+
+div#gamespace {
+	position: relative;
+	margin: 10px;
+	padding: 10px;
+	height: 350px;
+	background-color: rgba(255, 255, 255, .1);
+	border: 1px solid white;  
+	cursor: url("../img/leaf.png"), default;
+}
+
+div#gamespace img { 
+	position: absolute;
+} 
+
+.gameimage {
+    width: 120px;
+}
+
+div#content {
+    width: 700px;
+    margin:0 auto;
+	padding: 20px;
+	 }
+	 #gameOverDialog {
+		font-size: 24px;             /* Larger text for better readability */
+		background-color: #f8f8f8;  /* Light neutral background */
+		border: 1px solid #e0e0e0;  /* Subtle border */
+		padding: 30px;              /* Adequate padding inside the dialog */
+		border-radius: 10px;        /* Rounded corners */
+		width: 300px;               /* Fixed width for consistency */
+		text-align: center;         /* Centered text */
+		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);  /* Optional drop shadow */
+	}
+	
+	
+audio {
+    width: 100px;
+    height: 24px;
+	padding: 10px;
+	font-size: 12px;		
+	}
+#soundOff {
+	width: 40px;
+	height: 30px;
+	font-size: 12px;
+	border-radius: 4px;
+	background-color: black;
+}

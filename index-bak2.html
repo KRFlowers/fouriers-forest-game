@@ -1,0 +1,246 @@
+<!-- 
+		Name: Kristi Loesch
+		Date: 7/8/2021
+		Class: CSCI2447, Javascript Fundamentals
+		Project 5
+        Image by <a href="https://pixabay.com/users/gustavorezende-1488336/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=4272423">Gustavo Rezende</a> from <a href="https://pixabay.com/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=4272423">Pixabay</a>
+        Cicada Sound Effect https://notification-sounds.com/584-cicada-sound-effect.html
+        BugController from https://github.com/Auz/Bug
+    -->
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Cicada Smash (CSCI2447)</title>
+    <!-- CSS styles: This is for me to worry about; not you. -->
+    
+	<link href="css/game.css" rel="stylesheet" />
+
+<style>
+.custom-modal {
+    display: none;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.6);
+    z-index: 1;
+}
+.modal-content {
+    background-color: #f8f8f8;
+    margin: 15% auto;
+    padding: 30px;
+    border: 1px solid #e0e0e0;
+    width: 300px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+.close-button {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    cursor: pointer;
+}
+.close-button:hover {
+    color: #000;
+}
+</style>
+
+
+    <link rel="icon" type="image/x-icon" href="img/favicon.ico" />
+
+    <script type="text/javascript" src="js/jquery-3.6.0.min.js"></script>
+    
+    <script type="text/javascript" src="Auz-Bug-8eac7b7/bug-min.js"></script> 
+    <script>
+        var userName = "";
+        var userScore = 0;
+        var gameClock;
+        var addClock;
+        var hideClock;
+        var imageCount = 0;
+        var imageArray = [];
+
+        $(document).ready(
+            function(){	
+                //  userName = prompt("Enter your first name:", " ");
+                // document.getElementById("gamespace").style.cursor = url("img/fly-swatter.png");
+               // $(".namePrompt").html("Hello " + userName + ", are you ready to play the game? ");
+                $(".timer").show();
+                new BugController({'minBugs':100, 'maxBugs':300, });  //Start bugs animation
+
+                $("#start_button").on("click",
+                    function () {
+                        startGame();
+                });   
+                $("#start_button").css({"width": "100px",
+                                        "height": "40px", 
+                                        "font-size": "18px",
+                                        "font-weight": "bold",
+                                        "color": "#228B22",
+                                        "border-color": "yellow"});
+
+                $("#gameOverDialog").dialog({       // JQuery UI dialog to announces game over with score
+                    modal:true,
+                    autoOpen:false,
+                    width:500,
+                 });
+                   
+                $( function() {                     // JQuery UI Load tooltips
+                    $("#start_button").tooltip();
+                    $(".timer").tooltip();
+                    $(".score").tooltip();
+                });
+
+            });              
+                     
+        function randomNumberx(){
+            return Math.floor((Math.random()*543));     
+        }           
+     
+        function randomNumbery(){
+            return Math.floor((Math.random()*280));
+        }
+
+        function randomNumberImage(){
+            return Math.floor((Math.random()*2000));
+        }
+
+        function updateScore(){
+            userScore += 1;
+            $(".score").html(userScore + " pts");            
+        }
+       
+        function startGame(){
+            // When user presses start, Initialize all gamespace elements and start game
+            secRemaining = 30;                              //set timer to 30 sec
+            userScore = 0;
+            window.location = "#gamespace";                 // jump to gamespace
+            var imageCount = 0;                             // set imageCount to zero
+            imageArray = [];                                //Clear image array
+            $('#playSounds')[0].play();                     // Play sounds
+            $("#start_button").off("click");                //turn off ability to click start button
+            $(".timer").html(secRemaining + " sec left");
+            $(".score").html(userScore + " pts"); 
+            $("#gamespace img").remove();                   //remove any previous gamespace images
+            $("#gamespace").on("click", "img",              // turn on event listener for click on images
+                    function() {
+                        updateScore();                      //update score if clicked
+                        $(this).remove();                   //remove an image if clicked 
+                    });
+            updateTimer();                                  //start the timer
+              }  
+            
+        function updateTimer(){                
+            if (secRemaining < 0) {
+                // When time runs out, do the following steps to reset game parameters
+                $('#playSounds')[0].pause();               //Pause sound
+                $('#playSounds')[0].currentTime =  0;      //set sound back to beginning
+                clearTimeout(addClock);                    // Stop image append clock
+                clearTimeout(gameClock);                   // Stop game clock    
+                $(".score").html(userScore + " pts");             
+                $("#gameOverDialog").dialog("open");       // Open Game Over dialog box
+                $("#gamespace").off("click");              // Turn off gamespace click
+                $("#start_button").on("click",             // Turn back on Start button click
+                    function () {
+                        startGame()
+                });  
+            }  
+            else{ 
+                //While time is remaining, do the following to play the game
+                addClock = randomNumberImage();
+                hideClock = randomNumberImage();
+                addClock = setTimeout("addImage()", addClock);      //add image at random interval
+                hideClock = setTimeout("hideImage()", hideClock);   //hide images at random interval
+                $(".timer").html(secRemaining + " sec left");       //display seconds left            
+                secRemaining -= 1;  
+                gameClock = setTimeout("updateTimer()", 1000);
+               
+                 }                    
+            }
+        function addImage(){
+            // Add image to page, each image will have a unique ID provided by the imageCount variable
+            var xPos = randomNumberx();
+            var yPos = randomNumbery(); 
+            var imageID = imageCount + "image";
+            $("#gamespace").append(`<img class="gameimage" id="${imageID}" src="img/gameimage.png" style="left: ${xPos}px; top: ${yPos}px;"/>`);
+            setTimeout(`updateArray("${imageID}")`, 1000);          // update image array with new image after it has been on the screen for 1 sec
+            imageCount++; 
+            }  
+
+        function updateArray(imageID){
+            // keep track of images currently on the screen with an array
+            imageArray.push(imageID);    
+        }
+
+        function hideImage(){
+            // Hide images at a random after a random interval
+            var randomIndex =Math.floor(Math.random()*imageArray.length);  
+            var hideImage = imageArray[randomIndex];                   //select a random item of the array (of available images) to hide
+            imageArray.splice(randomIndex,1);  
+            $(`#${hideImage}`).hide();
+            //alert(hideImage);
+            }  
+ 
+      </script>
+    </head>
+
+  <body>
+   
+	<div id="content">
+
+        <h1>Cicada Smash!</h1>
+	    <div id="instructions"  >
+             <p > The cicadas are swarming! After clicking "start", you will have 30 seconds to click and destroy as many as you can. The images appear randomly so be ready!</p>
+        </div>
+                     
+        <div id="controls">
+            <span class = "score" title ="Your score">0 pts</span>
+            <button type="button" id="start_button" title = "Click to start">Start!</button>
+        </div>
+       
+        <div class="timer" title="Seconds remaining">
+            30 sec left
+        </div>
+    	
+        <div id="gamespace">
+		</div>
+      
+        <div id="gameOverDialog" title = "Game Over!">
+           <p> You scored <span class="score" >0 pts</span><br>
+            <br>Press the close button and then Start to play again.</p>
+        </div>
+
+        <div id="sound" >
+            To turn off cicada sound, click below after game starts. <br>
+            <audio id="playSounds" autoplay controls>
+                <source src="audio/163688__cognito-perceptu__cicadas.wav" type="audio/wav" loop>
+            </audio>
+        </div>
+
+    </div>
+    
+  
+<script>
+// When the game is over
+function gameOver() {
+    $("#gameOverDialog").show();
+}
+
+// When the close button is clicked
+$(".close-button").click(function() {
+    $("#gameOverDialog").hide();
+});
+
+// If clicked outside the modal content
+$(window).click(function(event) {
+    if ($(event.target).is("#gameOverDialog")) {
+        $("#gameOverDialog").hide();
+    }
+});
+</script>
+
+</body>
+</html>
