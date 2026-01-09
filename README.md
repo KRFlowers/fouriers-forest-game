@@ -42,4 +42,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-Made by Kristi Loesch
+**Author:** K Flowers  
+**Contact:** kristirflowers@gmail.com
