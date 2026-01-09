@@ -245,15 +245,15 @@
             currentDifficulty = level;
             switch(level) {
                 case 'easy':
-                    spawnRate = 900;
+                    spawnRate = 1000;
                     maxCicadas = 30;
                     break;
                 case 'medium':
-                    spawnRate = 600;
+                    spawnRate = 750;
                     maxCicadas = 40;
                     break;
                 case 'hard':
-                    spawnRate = 400;
+                    spawnRate = 500;
                     maxCicadas = 60;
                     break;
             }
@@ -345,9 +345,14 @@
             }  
             else{ 
                 //While time is remaining, do the following to play the game
-                addClock = randomNumberImage();
+                
+                // Calculate how aggressively to spawn based on remaining cicadas
+                var remainingCicadas = maxCicadas - cicadasSpawnedThisGame;
+                var spawnInterval = remainingCicadas > 0 ? Math.min(spawnRate, (secRemaining * 1000) / remainingCicadas) : spawnRate;
+                
+                addClock = Math.floor(Math.random() * spawnInterval);
                 hideClock = randomNumberImage();
-                addClock = setTimeout("addImage()", addClock);      //add image at random interval
+                addClock = setTimeout("addImage()", addClock);      //add image at calculated interval
                 hideClock = setTimeout("hideImage()", hideClock);   //hide images at random interval
                 $(".timer").html(secRemaining + " sec left");       //display seconds left            
                 secRemaining -= 1;  
@@ -497,16 +502,14 @@
 	    <div id="instructions"  >
              <p > The cicadas are swarming! After clicking "start", you will have 30 seconds to click and destroy as many as you can. The images appear randomly so be ready!</p>
         </div>
-        
-        <div id="difficulty-selector">
-            <span>Select Difficulty:</span>
-            <button class="difficulty-btn" id="easyBtn" onclick="setDifficulty('easy')">Easy (30)</button>
-            <button class="difficulty-btn active" id="mediumBtn" onclick="setDifficulty('medium')">Medium (40)</button>
-            <button class="difficulty-btn" id="hardBtn" onclick="setDifficulty('hard')">Hard (60)</button>
-        </div>
                      
         <div id="controls">
             <span class = "score" title ="Your score">0 pts</span>
+            <div id="difficulty-selector">
+                <button class="difficulty-btn" id="easyBtn" onclick="setDifficulty('easy')">Easy (30)</button>
+                <button class="difficulty-btn active" id="mediumBtn" onclick="setDifficulty('medium')">Medium (40)</button>
+                <button class="difficulty-btn" id="hardBtn" onclick="setDifficulty('hard')">Hard (60)</button>
+            </div>
             <button type="button" id="start_button" title = "Click to start">Start!</button>
         </div>
        
