@@ -27,8 +27,8 @@
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0,0,0,0.6);
-    z-index: 1;
+    background-color: rgba(0,0,0,0.8);
+    z-index: 1000;
 }
 
 .modal-content {
@@ -39,10 +39,101 @@
     background-color: #f8f8f8;
     padding: 30px;
     border: 1px solid #e0e0e0;
-    width: 300px;
+    width: 500px;
+    max-width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
     text-align: center;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     border-radius: 10px;
+}
+
+.modal-content h2 {
+    color: #228B22;
+    margin-top: 0;
+}
+
+.modal-content h3 {
+    color: #333;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    font-size: 18px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin: 20px 0;
+    text-align: left;
+}
+
+.stat-item {
+    background: white;
+    padding: 12px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+}
+
+.stat-label {
+    display: block;
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.stat-value {
+    display: block;
+    font-size: 20px;
+    font-weight: bold;
+    color: #228B22;
+}
+
+.history-list {
+    max-height: 200px;
+    overflow-y: auto;
+    margin-top: 10px;
+}
+
+.history-item {
+    background: white;
+    padding: 10px;
+    margin-bottom: 8px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+}
+
+.history-date {
+    color: #666;
+    font-weight: bold;
+}
+
+.history-score {
+    color: #228B22;
+}
+
+.history-accuracy {
+    color: #555;
+}
+
+.close-button {
+    margin-top: 20px;
+    padding: 12px 30px;
+    background-color: #228B22;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close-button:hover {
+    background-color: #1a6b1a;
 }
 
 </style>
@@ -62,6 +153,15 @@
         var hideClock;
         var imageCount = 0;
         var imageArray = [];
+        
+        // Statistical tracking variables
+        var totalClicks = 0;
+        var successfulClicks = 0;
+        var missedClicks = 0;
+        var clickTimes = [];
+        var gameStartTime = 0;
+        var cicadasSpawned = 0;
+        var cicadasMissed = 0;
 
         $(document).ready(
             function(){
@@ -102,6 +202,9 @@
 
         function updateScore(){
             userScore += 1;
+            successfulClicks++;
+            var clickTime = Date.now() - gameStartTime;
+            clickTimes.push(clickTime);
             $(".score").html(userScore + " pts");            
         }
        
@@ -109,6 +212,16 @@
             // When user presses start, initialize all gamespace elements and start game
             var secRemaining = 30;
             userScore = 0;
+            
+            // Reset statistics
+            totalClicks = 0;
+            successfulClicks = 0;
+            missedClicks = 0;
+            clickTimes = [];
+            cicadasSpawned = 0;
+            cicadasMissed = 0;
+            gameStartTime = Date.now();
+            
             window.location = "#gamespace";
             var imageCount = 0;
             imageArray = [];
@@ -117,11 +230,22 @@
             $(".timer").html(secRemaining + " sec left");
             $(".score").html(userScore + " pts"); 
             $("#gamespace img").remove();                   //remove any previous gamespace images
+            
+            // Track clicks on cicadas
             $("#gamespace").on("click", "img",
                     function() {
+                        totalClicks++;
                         updateScore();
                         $(this).remove();
                     });
+            
+            // Track missed clicks (clicking on empty space)
+            $("#gamespace").on("click", function(e) {
+                if (e.target.id === "gamespace") {
+                    totalClicks++;
+                    missedClicks++;
+                }
+            });
 
             updateTimer();                                  //start the timer
               }  
@@ -133,8 +257,12 @@
                 $('#playSounds')[0].currentTime =  0;      //set sound back to beginning
                 clearTimeout(addClock);                    // Stop image append clock
                 clearTimeout(gameClock);                   // Stop game clock    
-                $(".score").html(userScore + " pts");             
-                $("#gameOverDialog").dialog("open");       // Open Game Over dialog box
+                $(".score").html(userScore + " pts");
+                
+                // Calculate and display statistics
+                displayGameStats();
+                $("#gameOverDialog").show();
+                
                 $("#gamespace").off("click");              // Turn off gamespace click
                 $("#start_button").on("click",
                     function () {
@@ -160,6 +288,7 @@
             var imageID = imageCount + "image";
             $("#gamespace").append(`<img class="gameimage" id="${imageID}" src="img/gameimage.png" style="left: ${xPos}px; top: ${yPos}px;"/>`);
             setTimeout(`updateArray("${imageID}")`, 1000);          // update image array with new image after it has been on the screen for 1 sec
+            cicadasSpawned++;
             imageCount++; 
             }  
 
@@ -174,6 +303,89 @@
             var hideImage = imageArray[randomIndex];
             imageArray.splice(randomIndex, 1);  
             $(`#${hideImage}`).hide();
+            cicadasMissed++;
+        }
+        
+        function displayGameStats() {
+            // Calculate statistics
+            var accuracy = totalClicks > 0 ? ((successfulClicks / totalClicks) * 100).toFixed(1) : 0;
+            var catchRate = cicadasSpawned > 0 ? ((successfulClicks / cicadasSpawned) * 100).toFixed(1) : 0;
+            var avgReactionTime = clickTimes.length > 0 ? (clickTimes.reduce((a, b) => a + b, 0) / clickTimes.length / 1000).toFixed(2) : 0;
+            
+            // Build stats HTML
+            var statsHTML = `
+                <h3>Game Statistics</h3>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <span class="stat-label">Final Score:</span>
+                        <span class="stat-value">${userScore}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Click Accuracy:</span>
+                        <span class="stat-value">${accuracy}%</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Cicadas Caught:</span>
+                        <span class="stat-value">${successfulClicks} / ${cicadasSpawned}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Catch Rate:</span>
+                        <span class="stat-value">${catchRate}%</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Missed Clicks:</span>
+                        <span class="stat-value">${missedClicks}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Avg Reaction Time:</span>
+                        <span class="stat-value">${avgReactionTime}s</span>
+                    </div>
+                </div>
+            `;
+            
+            // Store game in history
+            saveGameHistory({
+                date: new Date().toLocaleDateString(),
+                score: userScore,
+                accuracy: accuracy,
+                catchRate: catchRate,
+                avgReactionTime: avgReactionTime
+            });
+            
+            // Display stats
+            $("#gameStats").html(statsHTML);
+            displayGameHistory();
+        }
+        
+        function saveGameHistory(gameData) {
+            var history = JSON.parse(localStorage.getItem('cicadaGameHistory') || '[]');
+            history.push(gameData);
+            // Keep only last 10 games
+            if (history.length > 10) {
+                history = history.slice(-10);
+            }
+            localStorage.setItem('cicadaGameHistory', JSON.stringify(history));
+        }
+        
+        function displayGameHistory() {
+            var history = JSON.parse(localStorage.getItem('cicadaGameHistory') || '[]');
+            if (history.length === 0) {
+                $("#gameHistory").html('<p>No previous games yet. Play more to track your progress!</p>');
+                return;
+            }
+            
+            var historyHTML = '<h3>Recent Performance</h3><div class="history-list">';
+            history.slice().reverse().forEach(function(game, index) {
+                historyHTML += `
+                    <div class="history-item">
+                        <span class="history-date">${game.date}</span>
+                        <span class="history-score">Score: ${game.score}</span>
+                        <span class="history-accuracy">Accuracy: ${game.accuracy}%</span>
+                    </div>
+                `;
+            });
+            historyHTML += '</div>';
+            $("#gameHistory").html(historyHTML);
         }
 
         // Modal handlers
@@ -214,16 +426,22 @@
     	
         <div id="gamespace">
 		</div>
-      
         
-
-</div>
-
-           <p> You scored <span class="score" >0 pts</span><br>
-            <br>Press the close button and then Start to play again.</p>
+        <!-- Game Over Modal with Statistics -->
+        <div id="gameOverDialog" class="custom-modal">
+            <div class="modal-content">
+                <h2>Game Over!</h2>
+                <p>You scored <span class="score">0 pts</span></p>
+                
+                <div id="gameStats"></div>
+                
+                <div id="gameHistory"></div>
+                
+                <button class="close-button">Play Again</button>
+            </div>
         </div>
 
-        <div id="sound" >
+        <div id="sound">
             To turn off cicada sound, click below after game starts. <br>
             <audio id="playSounds" autoplay controls>
                 <source src="audio/163688__cognito-perceptu__cicadas.wav" type="audio/wav" loop>
@@ -231,9 +449,5 @@
         </div>
 
     </div>
-    
-  
-
-
 </body>
 </html>
