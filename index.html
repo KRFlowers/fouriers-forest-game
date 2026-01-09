@@ -362,12 +362,18 @@
             }
         function addImage(){
             // Add image to page, each image will have a unique ID provided by the imageCount variable
+            // Only spawn if we haven't reached maxCicadas
+            if (cicadasSpawnedThisGame >= maxCicadas) {
+                return; // Stop spawning once we've reached the max
+            }
+            
             var xPos = randomNumberx();
             var yPos = randomNumbery(); 
             var imageID = imageCount + "image";
             $("#gamespace").append(`<img class="gameimage" id="${imageID}" src="img/gameimage.png" style="left: ${xPos}px; top: ${yPos}px;"/>`);
             setTimeout(`updateArray("${imageID}")`, 1000);          // update image array with new image after it has been on the screen for 1 sec
             cicadasSpawned++;
+            cicadasSpawnedThisGame++; // Track cicadas spawned THIS game
             imageCount++; 
             }  
 
@@ -482,6 +488,13 @@
             
             $(document).on('click', '#exitBtn', function() {
                 $('#gameOverDialog').hide();
+                // Clear the gamespace and reset to initial state
+                $("#gamespace img").remove();
+                userScore = 0;
+                secRemaining = 30;
+                $(".score").html("0 pts");
+                $(".timer").html("30 sec left");
+                window.location = "#content"; // Scroll back to top
             });
             
             $(window).click(function(event) {
