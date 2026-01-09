@@ -204,6 +204,8 @@
         var secRemaining = 30;
         var currentDifficulty = 'medium';
         var spawnRate = 600;
+        var maxCicadas = 40;
+        var cicadasSpawnedThisGame = 0;
         
         // Statistical tracking variables
         var totalClicks = 0;
@@ -244,12 +246,15 @@
             switch(level) {
                 case 'easy':
                     spawnRate = 900;
+                    maxCicadas = 30;
                     break;
                 case 'medium':
                     spawnRate = 600;
+                    maxCicadas = 40;
                     break;
                 case 'hard':
-                    spawnRate = 350;
+                    spawnRate = 400;
+                    maxCicadas = 60;
                     break;
             }
             $('.difficulty-btn').removeClass('active');
@@ -280,6 +285,7 @@
             // When user presses start, initialize all gamespace elements and start game
             secRemaining = 30;
             userScore = 0;
+            cicadasSpawnedThisGame = 0;
             
             // Reset statistics
             totalClicks = 0;
@@ -463,23 +469,21 @@
         }
 
         // Modal handlers
-        function gameOver() {
-            $("#gameOverDialog").show();
-        }
-
-        $("#playAgainBtn").click(function() {
-            $("#gameOverDialog").hide();
-            startGame();
-        });
-        
-        $("#exitBtn").click(function() {
-            $("#gameOverDialog").hide();
-        });
-
-        $(window).click(function(event) {
-            if ($(event.target).is("#gameOverDialog")) {
-                $("#gameOverDialog").hide();
-            }
+        $(document).ready(function() {
+            $(document).on('click', '#playAgainBtn', function() {
+                $('#gameOverDialog').hide();
+                startGame();
+            });
+            
+            $(document).on('click', '#exitBtn', function() {
+                $('#gameOverDialog').hide();
+            });
+            
+            $(window).click(function(event) {
+                if ($(event.target).is('#gameOverDialog')) {
+                    $('#gameOverDialog').hide();
+                }
+            });
         });
 
       </script>
@@ -493,17 +497,17 @@
 	    <div id="instructions"  >
              <p > The cicadas are swarming! After clicking "start", you will have 30 seconds to click and destroy as many as you can. The images appear randomly so be ready!</p>
         </div>
+        
+        <div id="difficulty-selector">
+            <span>Select Difficulty:</span>
+            <button class="difficulty-btn" id="easyBtn" onclick="setDifficulty('easy')">Easy (30)</button>
+            <button class="difficulty-btn active" id="mediumBtn" onclick="setDifficulty('medium')">Medium (40)</button>
+            <button class="difficulty-btn" id="hardBtn" onclick="setDifficulty('hard')">Hard (60)</button>
+        </div>
                      
         <div id="controls">
             <span class = "score" title ="Your score">0 pts</span>
             <button type="button" id="start_button" title = "Click to start">Start!</button>
-        </div>
-        
-        <div id="difficulty-selector">
-            <span>Difficulty:</span>
-            <button class="difficulty-btn" id="easyBtn" onclick="setDifficulty('easy')">Easy</button>
-            <button class="difficulty-btn active" id="mediumBtn" onclick="setDifficulty('medium')">Medium</button>
-            <button class="difficulty-btn" id="hardBtn" onclick="setDifficulty('hard')">Hard</button>
         </div>
        
         <div class="timer" title="Seconds remaining">
