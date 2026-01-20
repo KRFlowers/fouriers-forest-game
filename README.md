@@ -3,6 +3,8 @@
 
 Fourier's Forest is a statistics quiz game with a forest theme background built in JavaScript. It was originally created as a class project and later extended to add data science quiz elements. Give it a try and test your knowledge!
 
+Questions have been created in alignment with AP Statistics course.
+
 **JavaScript concepts practiced:**
 - DOM manipulation and event handling
 - CSS Grid layout for responsive card positioning
@@ -20,6 +22,20 @@ Fourier's Forest is a statistics quiz game with a forest theme background built 
 4. Click only on valid concepts to score points
 5. Avoid invalid concepts (they subtract points)
 6. Win by finding more signal than noise before time runs out
+
+## Difficulty Levels
+
+**Level 1 (Easy): Foundational Concepts**
+- Basic terminology, simple calculations, and fundamental principles
+- Mean, median, mode, standard deviation, z-scores, correlation
+
+**Level 2 (Medium): Inference & Probability**
+- Probability rules, sampling distributions, confidence intervals, hypothesis testing
+- Binomial/normal distributions, Central Limit Theorem, p-values, Type I/II errors
+
+**Level 3 (Hard): Advanced Inference & Modeling**
+- Complex inference, regression, chi-square, ANOVA, experimental design
+- Residual analysis, r², confounding variables, randomization, Simpson's Paradox
 
 ## Features
 
